@@ -1,0 +1,102 @@
+---
+title: "Vorlesung Forschungsmethoden"
+subtitle: "Verteilungen beschreiben"
+author: "Samuel Merk"
+format: 
+  revealjs:
+    title-slide-attributes:
+      data-background-image: img/sash.svg
+      data-background-size: 30%
+      data-background-position: 0 0
+    slide-number: true
+    controls: true
+    logo: img/PHlogo.svg
+    theme: [dark, css/custom.scss]
+    chalkboard:
+      theme: whiteboard
+      boardmarker-width: 3
+      buttons: true
+      chalk-effect: 0
+    fullscreen: true
+    pdfexport: true
+editor: visual
+---
+
+## Was haben wir heute vor?
+
+-   Einführung: Verteilungsbeschreibung
+
+-   Übung: Verteilungsbeschreibung mit AID:A-Daten
+
+## Arbeitsauftrag: {.smaller}
+
+```{r}
+library(fontawesome)
+library(tidyverse)
+set.seed(848265)
+
+# Change css to lecker PH green
+if(!dir.exists("img"))
+dir.create("img")
+if(!dir.exists("css"))
+dir.create("css")
+fileConn<-file("css/custom.scss")
+writeLines(c("/*-- scss:defaults --*/",
+             "$link-color: #8cd000 !default;",
+             ".imp {color: #8cd000;}"), fileConn)
+close(fileConn)
+
+# create sash with URL
+sash <- 
+  ggplot() + 
+  geom_polygon(data = tibble(x = c(0,4,5.5,0),
+                             y = c(1,5,5,-.5)),
+               aes(x,y), fill = "#8cd000") + 
+  coord_fixed() +
+  annotate(geom = "text", 
+           label = " www.ph-ka.de", 
+           x = .8, y = .8, 
+           angle = 45,
+           hjust = 0, vjust = 0,
+           size = 10,
+           color = "white") +
+ theme_void() + 
+ theme(plot.margin = margin(-2,0,0,-12, unit = "cm"))
+ggsave("img/sash.svg", sash)
+
+library(jmvReadWrite)
+library(tidyverse)
+data_aida2019 <- 
+  read_omv("dji_suf_personen.omv") %>% 
+  filter(IZP == "trifft zu") %>% 
+  select(XALTER, h55867_1, h55805_2, h35851, h33300_4) %>% 
+  mutate(h55867_1 = case_when(h55867_1  == "sehr gut" ~ 1,
+                              h55867_1  == "gut" ~ 2,
+                              h55867_1  == "befriedigend" ~ 3,
+                              h55867_1  == "ausreichend" ~ 4,
+                              h55867_1  == "mangelhaft" ~ 5,
+                              h55867_1  == "ungenügend" ~ 6,
+                              TRUE ~ as.numeric(NA)),
+         h33300_4 = as.numeric(h33300_4),
+         XALTER = as.numeric(XALTER))
+
+write_omv(data_aida2019, "data_aida2019.omv")
+```
+
+Wir arbeiten heute mit einem kleinen Teil der AID:A Welle 2019 (siehe [https://bit.ly/merk065]{.imp}). Machen Sie sich unter [https://bit.ly/merk064]{.imp} mit der AID:A-Studie vertraut und beantworten Sie die folgenden Fragen:
+
+-   Stellt AIDA ...
+
+    -   ... eine deskriptive, explorative oder explanative Studie dar?
+
+    -   ... eine querschnittliche, Trend- oder messwiederholte Studie dar?
+
+    -   ... qualitative oder quantitative Studie dar?
+
+Bearbeiten Sie außerdem die folgenden Fragestellungen anhand der soeben erlernten Statistiken.
+
+-   Wie ist die zentrale Tendenz der Schulnote in Mathematik `h55867_1`?
+
+-   Wie würden Sie die Verteilung der Variable Stresserleben `h33300_4` beschreiben?
+
+-   Was betrachten Sie nur die deskriptiven Statistiken der Variable "Anzahl der Freunde" `h35851`. Können Sie daraus ableiten wie das Histogramm aussieht?
